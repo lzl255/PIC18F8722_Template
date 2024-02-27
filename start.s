@@ -36,31 +36,13 @@ resetVector:
 
 ; --- VARIABLES ---
 
-DELAY_COUNTER_OUTER	equ 0x200
-DELAY_COUNTER_INNER	equ 0x201
+DELAY_COUNTER	equ 0x200
 
 ; --- FUNCTIONS ---
 
 delay:; void -> void
-	_delay_loop_inner:
-		incf	DELAY_COUNTER_INNER, a
-		incf	DELAY_COUNTER_INNER, a
-		incf	DELAY_COUNTER_INNER, a
-		incf	DELAY_COUNTER_INNER, a
-		decf	DELAY_COUNTER_INNER, a
-		decf	DELAY_COUNTER_INNER, a
-		decf	DELAY_COUNTER_INNER, a
-		bz	_delay_loop_inner_end
-		goto	_delay_loop_inner
-	_delay_loop_inner_end:
-	incf	DELAY_COUNTER_OUTER, a
-	incf	DELAY_COUNTER_OUTER, a
-	incf	DELAY_COUNTER_OUTER, a
-	incf	DELAY_COUNTER_OUTER, a
-	decf	DELAY_COUNTER_OUTER, a
-	decf	DELAY_COUNTER_OUTER, a
-	decf	DELAY_COUNTER_OUTER, a
-	bz	delay
+	incf	DELAY_COUNTER
+	bnz	delay
 	return
 
 ; --- START ---
@@ -72,16 +54,16 @@ delay:; void -> void
 ; RA4 -> Q3 (capacitor for LED bulbs)
 ; RB0 -> PB2 (left push button)
 ; RJ5 -> PB1 (right push button)
+; RH4~RH7 -> Left 4 switches
+; RC2~RC5 -> Right 4 switches
 
 PSECT start, class=CODE, reloc=2
 start:
 	; init TRIS states
-	clrf	TRISF, a	; RFx -> General output
-	bcf	TRISH, 0, a	; RH0 -> Q1
-	bcf	TRISH, 1, a	; RH1 -> Q2
-	bcf	TRISA, 4, a	; RA4 -> Q3
-	bsf	TRISB, 0, a	; RB0 -> PB2
-	bsf	TRISJ, 5, a	; RB1 -> PB1
+	clrf	TRISF, a
+	bcf	TRISH, 0, a
+	bcf	TRISH, 1, a
+	bcf	TRISA, 4, a
 
 loop:
 	; LED bulbs
